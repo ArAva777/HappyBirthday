@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Happy Birthday!</title>
+<style>
+  body {
+    background: #fff;
+    color: #000;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    padding: 20px;
+    user-select: none;
+    overflow-x: hidden;
+  }
+  h1 {
+    font-family: 'Treasure Map Deadhand', cursive;
+    font-size: 3rem;
+    margin-bottom: 0.2em;
+    color: #000;
+    filter: drop-shadow(2px 2px 0 #fff);
+  }
+  #confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1000;
+  }
+  .teufelsfrucht {
+    width: 150px;
+    margin: 20px auto;
+    cursor: pointer;
+  }
+  #birthday-audio {
+    display: none;
+  }
+  @media (max-width: 600px) {
+    h1 {
+      font-size: 2.2rem;
+    }
+    .teufelsfrucht {
+      width: 100px;
+    }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti-canvas"></canvas>
+<h1>Happy Birthday, Name-Platzhalter!</h1>
+<p>Ein kleiner Geburtstagsgruß im One Piece Stil (schwarz-weiß).</p>
+
+<img src="images/teufelsfrucht.png" alt="Teufelsfrucht" class="teufelsfrucht" id="fruit" />
+
+<audio id="birthday-audio" controls>
+  <source src="mp3/dummy.mp3" type="audio/mpeg" />
+  Dein Browser unterstützt kein Audio-Element.
+</audio>
+
+<script>
+// Konfetti Effekt
+const confettiCanvas = document.getElementById('confetti-canvas');
+const ctx = confettiCanvas.getContext('2d');
+confettiCanvas.width = window.innerWidth;
+confettiCanvas.height = window.innerHeight;
+
+const confettiCount = 150;
+const confetti = [];
+const colors = ['#000', '#222', '#444', '#666'];
+
+function randomRange(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+class Confetto {
+  constructor() {
+    this.x = Math.random() * confettiCanvas.width;
+    this.y = Math.random() * confettiCanvas.height - confettiCanvas.height;
+    this.size = randomRange(5, 10);
+    this.speed = randomRange(1, 3);
+    this.angle = randomRange(0, 2 * Math.PI);
+    this.color = colors[Math.floor(Math.random() * colors.length)];
+  }
+  update() {
+    this.y += this.speed;
+    if (this.y > confettiCanvas.height) this.y = 0 - this.size;
+    this.angle += 0.05;
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+for(let i = 0; i < confettiCount; i++) {
+  confetti.push(new Confetto());
+}
+
+function animate() {
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confetti.forEach(c => {
+    c.update();
+    c.draw();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// Audio abspielen, wenn Teufelsfrucht angeklickt wird
+document.getElementById('fruit').addEventListener('click', () => {
+  const audio = document.getElementById('birthday-audio');
+  if(audio.paused) audio.play();
+  else audio.pause();
+});
+</script>
+</body>
+</html>
